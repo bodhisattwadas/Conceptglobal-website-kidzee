@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -29,10 +30,23 @@ class AuthController extends Controller
         $remember = $request->boolean('remember');
 
         if (Auth::attempt($credentials, $remember)) {
+            /** @var User $user */
+            $user = Auth::user();
+
+            if (! $user->isAdmin() || ! $user->is_active) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return back()->withErrors([
+                    'email' => 'Access denied. This portal is restricted to authorized administrative accounts only.',
+                ])->onlyInput('email');
+            }
+
             $request->session()->regenerate();
 
             return redirect()->intended(route('admin.dashboard'))
-                ->with('success', 'Welcome back to Kidzee Administrative Dashboard!');
+                ->with('success', 'Authenticated successfully as Administrator.');
         }
 
         return back()->withErrors([

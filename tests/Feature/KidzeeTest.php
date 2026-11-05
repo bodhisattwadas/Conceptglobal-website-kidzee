@@ -119,6 +119,45 @@ class KidzeeTest extends TestCase
         $responsePhone->assertSee('Reyansh Sengupta');
     }
 
+    public function test_login_page_renders_cleanly_without_demo_placeholders_or_prefilled_credentials(): void
+    {
+        $response = $this->get('/admin/login');
+
+        $response->assertStatus(200);
+        $response->assertSee('Administrator Portal');
+        $response->assertSee('Admin Email Address');
+        $response->assertSee('Sign In as Administrator');
+
+        // Confirm all demo placeholders and hardcoded credentials are removed for live production
+        $response->assertDontSee('Demo: admin@kidzee.com');
+        $response->assertDontSee('admin123');
+        $response->assertDontSee('Staff Email Address');
+    }
+
+    public function test_non_admin_cannot_access_admin_portal(): void
+    {
+        $nonAdmin = User::create([
+            'name' => 'General Visitor',
+            'email' => 'visitor@example.com',
+            'password' => bcrypt('password123'),
+            'role' => 'user',
+            'is_active' => true,
+        ]);
+
+        $loginResponse = $this->post('/admin/login', [
+            'email' => 'visitor@example.com',
+            'password' => 'password123',
+        ]);
+
+        $loginResponse->assertSessionHasErrors('email');
+        $this->assertGuest();
+
+        $directResponse = $this->actingAs($nonAdmin)->get('/admin');
+        $directResponse->assertRedirect('/admin/login');
+
+        $nonAdmin->delete();
+    }
+
     public function test_admin_authentication_and_dashboard_access(): void
     {
         $responseLogin = $this->post('/admin/login', [

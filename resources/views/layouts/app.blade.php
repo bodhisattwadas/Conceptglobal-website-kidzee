@@ -334,7 +334,9 @@
                 <p>© {{ date('Y') }} Kidzee Preschool & Day Care • Concept Global Education Network. All rights reserved.</p>
                 <div class="flex items-center gap-4">
                     <span>Opening Nov 20, 2026</span>
-                    <a href="{{ route('admin.login') }}" class="text-amber-400 hover:underline">Staff Portal</a>
+                    <a href="{{ route('admin.login') }}" class="text-amber-400 hover:underline flex items-center gap-1">
+                        <i class="fa-solid fa-lock text-[10px]"></i> Admin Portal
+                    </a>
                 </div>
             </div>
         </div>

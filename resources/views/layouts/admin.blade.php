@@ -140,7 +140,7 @@
                 </div>
                 <div class="truncate">
                     <p class="text-xs font-bold text-white truncate">{{ Auth::user()->name ?? 'Administrator' }}</p>
-                    <p class="text-[11px] text-slate-400 truncate">{{ Auth::user()->email ?? 'admin@kidzee.com' }}</p>
+                    <p class="text-[11px] text-slate-400 truncate">{{ Auth::user()?->email }}</p>
                 </div>
             </div>
             <form action="{{ route('admin.logout') }}" method="POST">
