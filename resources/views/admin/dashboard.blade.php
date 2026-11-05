@@ -20,9 +20,21 @@
         </div>
 
         <div class="flex items-center gap-3 bg-white/10 backdrop-blur-md p-3.5 rounded-2xl border border-white/10">
-            <div class="text-center px-3">
-                <span class="block text-2xl font-black text-amber-300 font-brand">{{ $daysToOpening }}</span>
-                <span class="text-[10px] uppercase font-bold text-purple-200 tracking-wider">Days Remaining</span>
+            <div class="flex items-center gap-2 px-2" id="admin-countdown-timer">
+                <div class="text-center min-w-[34px]">
+                    <span class="block text-2xl font-black text-amber-300 font-brand" id="admin-cd-days">{{ $daysRemaining }}</span>
+                    <span class="text-[10px] uppercase font-bold text-purple-200 tracking-wider">Days</span>
+                </div>
+                <span class="text-amber-300/70 font-black text-xl -mt-4">:</span>
+                <div class="text-center min-w-[34px]">
+                    <span class="block text-2xl font-black text-amber-300 font-brand" id="admin-cd-hours">{{ sprintf('%02d', $hoursRemaining) }}</span>
+                    <span class="text-[10px] uppercase font-bold text-purple-200 tracking-wider">Hours</span>
+                </div>
+                <span class="text-amber-300/70 font-black text-xl -mt-4">:</span>
+                <div class="text-center min-w-[34px]">
+                    <span class="block text-2xl font-black text-amber-300 font-brand" id="admin-cd-mins">{{ sprintf('%02d', $minsRemaining) }}</span>
+                    <span class="text-[10px] uppercase font-bold text-purple-200 tracking-wider">Mins</span>
+                </div>
             </div>
             <div class="h-8 w-px bg-white/20"></div>
             <div class="text-center px-3">
@@ -333,4 +345,36 @@
     </div>
 
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const targetDate = new Date('{{ $openingDate->toIso8601String() }}').getTime();
+
+        function updateAdminCountdown() {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+
+            const elDays = document.getElementById('admin-cd-days');
+            const elHours = document.getElementById('admin-cd-hours');
+            const elMins = document.getElementById('admin-cd-mins');
+
+            if (distance > 0) {
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+
+                if (elDays) elDays.innerText = days;
+                if (elHours) elHours.innerText = String(hours).padStart(2, '0');
+                if (elMins) elMins.innerText = String(minutes).padStart(2, '0');
+            } else {
+                if (elDays) elDays.innerText = '0';
+                if (elHours) elHours.innerText = '00';
+                if (elMins) elMins.innerText = '00';
+            }
+        }
+
+        updateAdminCountdown();
+        setInterval(updateAdminCountdown, 30000);
+    });
+</script>
 @endsection

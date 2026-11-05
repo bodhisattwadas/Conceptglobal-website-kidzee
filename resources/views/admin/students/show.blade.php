@@ -215,7 +215,7 @@
 
             <div class="flex items-center gap-2">
                 @if(!$currentInv)
-                    <form action="{{ route('admin.billing.generateSingle', $student) }}" method="POST">
+                    <form action="{{ route('admin.billing.monthly.single', $student) }}" method="POST">
                         @csrf
                         <input type="hidden" name="month" value="{{ $currentMonth }}">
                         <input type="hidden" name="year" value="{{ $currentYear }}">

@@ -137,6 +137,9 @@ class KidzeeTest extends TestCase
         $responseDash->assertSee('Inquiries');
         $responseDash->assertSee('Admission Forms');
         $responseDash->assertSee('Subscriptions');
+        $responseDash->assertSee('Days');
+        $responseDash->assertSee('Hours');
+        $responseDash->assertSee('Mins');
     }
 
     public function test_admin_can_update_inquiry_and_convert_to_application(): void
@@ -364,10 +367,16 @@ class KidzeeTest extends TestCase
         $this->assertEquals('Word of Mouth', $student->referral_source);
         $this->assertEquals(12500.00, $student->total_monthly_fee); // 7000 + 6000 - 500 = 12500
 
-        // 4. Verify student appears in student database with 'unbilled' flag for the month
+        // 4. Verify student profile renders properly and appears with 'unbilled' flag for the month
         $month = Carbon::now()->month;
         $year = Carbon::now()->year;
         $this->assertEquals('unbilled', $student->getMonthlyFeeStatus($month, $year)['status']);
+
+        $studentShowResponse = $this->actingAs($admin)->get(route('admin.students.show', $student));
+        $studentShowResponse->assertStatus(200);
+        $studentShowResponse->assertSee('Aarav Roy');
+        $studentShowResponse->assertSee('Unbilled');
+        $studentShowResponse->assertSee('Bill Now');
 
         // 5. Month-end fee bill generation
         $singleBillResponse = $this->actingAs($admin)->post(route('admin.billing.monthly.single', $student), [

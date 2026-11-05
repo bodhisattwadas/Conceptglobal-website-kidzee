@@ -16,9 +16,21 @@ class DashboardController extends Controller
 {
     public function index(): View
     {
-        $openingDate = Carbon::parse('2026-11-20');
+        $openingDate = Carbon::parse('2026-11-20 09:00:00');
         $now = Carbon::now();
-        $daysToOpening = max(0, $now->diffInDays($openingDate, false));
+
+        if ($now->greaterThanOrEqualTo($openingDate)) {
+            $daysRemaining = 0;
+            $hoursRemaining = 0;
+            $minsRemaining = 0;
+            $daysToOpening = 0;
+        } else {
+            $diff = $now->diff($openingDate);
+            $daysRemaining = (int) $diff->days;
+            $hoursRemaining = (int) $diff->h;
+            $minsRemaining = (int) $diff->i;
+            $daysToOpening = $daysRemaining;
+        }
 
         $totalQueries = Inquiry::count();
         $newQueries = Inquiry::where('status', 'new')->count();
@@ -47,6 +59,9 @@ class DashboardController extends Controller
         return view('admin.dashboard', compact(
             'openingDate',
             'daysToOpening',
+            'daysRemaining',
+            'hoursRemaining',
+            'minsRemaining',
             'totalQueries',
             'newQueries',
             'totalApplications',
